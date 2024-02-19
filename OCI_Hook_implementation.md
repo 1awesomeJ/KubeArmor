@@ -85,7 +85,7 @@ Below are the steps I followed:
 
 4. I logged into the minikube VM using ```minikube ssh```
 
-5. Inside the minikube VM, I created three files ```hooklog.txt```,   ```base_spec.json``` and  ```prestarthook.sh```
+5. Inside the minikube VM, I created three files ```hooklog.txt```,   ```base-spec.json``` and  ```prestarthook.sh```
  ```
    sudo touch /etc/containerd/base-spec.json
    sudo touch /usr/local/share/hooklog.txt
