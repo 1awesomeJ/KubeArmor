@@ -73,7 +73,99 @@ OCI hook executed successfully! at Wed Feb 14 15:31:54 UTC 2024
 docker@minikube:~$ 
 ```
 
-In the meantime, I will work on creating and testing an OCI hook with containerd runtime.
+I have also implemented an OCI hook in a containerd runtime.
+Below are the steps I followed:
+
+1. I stopped and deleted my existing minikube node.
+   ```minikube stop```
+   ```minikube delete```
+2. I started minikube using containerd as the container runtime
+```minikube start  --container-runtime=containerd ```
+
+3. I logged into the minikube VM using ```minikube ssh```
+
+4. Inside the minikube VM, I created three files ```hook_log.txt```,   ```base_spec.json``` and  ```prestarthook.sh```
+ ```
+   sudo touch /etc/containerd/base-spec.json
+   sudo touch /usr/local/share/hooklog.txt
+   sudo vi /usr/local/bin/prestarthook.sh
+```
+
+
+```prestarthook.sh```  has the following content:
+
+```
+docker@minikube:~$ cat /usr/local/bin/prestarthook.sh 
+#!/bin/bash
+
+echo "Setting default container runtime for pods..."
+export DEFAULT_CONTAINER_RUNTIME="containerd"
+echo "This prestart hook was successfully executed at $(date)" >> /usr/local/share/hooklog.txt
+docker@minikube:~$ 
+
+```
+
+I created the content of ```base-spec.json``` like so:
+
+```
+ctr oci spec >> spec.txt
+sudo cp spec.txt /etc/containerd/base-spec.json
+```
+Then I added the following using my text editor:
+```
+"hooks": {
+      "createContainer": [
+         {
+            "path": "/usr/local/bin/prestarthook.sh",
+            "args": []
+         }
+      ],
+      "poststop": [
+         {
+            "path": "/usr/local/bin/prestarthook.sh",
+            "args": []
+         }
+      ]
+  }
+
+```
+
+```hooklog.txt``` was an ampty file.
+
+5. I set the right permissions on the three files:
+
+```
+sudo chmod 666 /etc/containerd/base-spec.json
+sudo chmod 666 /usr/local/share/hooklog.txt 
+sudo chmod 777 /usr/local/bin/prestarthook.sh
+
+```
+6. I edited the ```/etc/containerd/config.toml``` and set the ```base_runtime_spec``` like so:
+```
+ [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+          runtime_type = "io.containerd.runc.v2"
+          +base_runtime_spec = "/etc/containerd/base-spec.json"
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+            SystemdCgroup = true
+```
+7. I restarted my containerd service:
+   ```sudo systemctl restart containerd```
+8. I exited the ssh connection to the minikube VM
+
+9. I created a new pod
+``` kubectl run test-pod --image=docker.io/nginx:latest```
+
+10. I logged back into the minkube VM
+```minikube ssh```
+
+11. I checked the content of ```hooklog.txt```, and it had the expected content like so:
+```
+docker@minikube:~$ cat /usr/local/share/hooklog.txt
+This prestart hook was successfully executed at Mon Feb 19 11:07:13 UTC 2024
+This prestart hook was successfully executed at Mon Feb 19 11:28:13 UTC 2024
+
+```
 I also plan on adding the steps for implmenting OCI hooks with a docker runtime to the design document soon.
 
 Thank you!!!
