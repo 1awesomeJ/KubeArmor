@@ -146,7 +146,11 @@ sudo chmod 777 /usr/local/bin/prestarthook.sh
  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
         [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
           runtime_type = "io.containerd.runc.v2"
-          +base_runtime_spec = "/etc/containerd/base-spec.json"
+```
+```
+          base_runtime_spec = "/etc/containerd/base-spec.json"
+```
+```
           [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
             SystemdCgroup = true
 ```
