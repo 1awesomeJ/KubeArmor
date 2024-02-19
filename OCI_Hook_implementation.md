@@ -72,19 +72,20 @@ docker@minikube:~$ cat /usr/share/containers/oci/hooks.d/hook_log.txt
 OCI hook executed successfully! at Wed Feb 14 15:31:54 UTC 2024
 docker@minikube:~$ 
 ```
-
+##Containerd:
 I have also implemented an OCI hook in a containerd runtime.
 Below are the steps I followed:
 
 1. I stopped and deleted my existing minikube node.
    ```minikube stop```
+   
    ```minikube delete```
-2. I started minikube using containerd as the container runtime
+3. I started minikube using containerd as the container runtime
 ```minikube start  --container-runtime=containerd ```
 
-3. I logged into the minikube VM using ```minikube ssh```
+4. I logged into the minikube VM using ```minikube ssh```
 
-4. Inside the minikube VM, I created three files ```hook_log.txt```,   ```base_spec.json``` and  ```prestarthook.sh```
+5. Inside the minikube VM, I created three files ```hooklog.txt```,   ```base_spec.json``` and  ```prestarthook.sh```
  ```
    sudo touch /etc/containerd/base-spec.json
    sudo touch /usr/local/share/hooklog.txt
