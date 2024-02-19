@@ -72,7 +72,7 @@ docker@minikube:~$ cat /usr/share/containers/oci/hooks.d/hook_log.txt
 OCI hook executed successfully! at Wed Feb 14 15:31:54 UTC 2024
 docker@minikube:~$ 
 ```
-##Containerd:
+## Containerd:
 I have also implemented an OCI hook in a containerd runtime.
 Below are the steps I followed:
 
